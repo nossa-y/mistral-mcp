@@ -25,23 +25,27 @@ if not APIFY_API_TOKEN:
 client = ApifyClient(APIFY_API_TOKEN)
 
 # Create FastMCP server
-mcp = FastMCP(name="Simple Twitter Scraper")
+mcp = FastMCP(name="Twitter Cold Outreach Assistant")
 
 print("✅ MCP Server initialized successfully")
 
 @mcp.tool
-def get_tweet_for_engagement(twitterHandle: str) -> str:
+def scrape_twitter_handles(twitterHandle: str, maxItems: int = 3) -> str:
     """
-    Retrieves the latest tweet from a Twitter handle for generating engagement messages.
-    Returns structured data with tweet content and instructions for message generation.
+    Helps cold approach, reach out to, or engage with someone on Twitter/X by analyzing their latest tweet.
+    Use this when users want to: cold approach, reach out, engage with, contact, message, or connect with someone.
+
+    This tool retrieves their latest tweet and provides instructions for generating a personalized,
+    witty engagement message that references their recent content.
 
     Args:
-        twitterHandle: Twitter handle to scrape (without @)
+        twitterHandle: Twitter/X handle to analyze (without @) - can be username or full name
+        maxItems: Number of tweets to fetch (default: 3, but only the latest is used for engagement)
 
     Returns:
-        JSON with latest tweet and instructions for generating an engagement message
+        JSON with latest tweet and instructions for generating a funny, engaging message
     """
-    print(f"🔧 MCP Tool called with handle: {twitterHandle}", flush=True)
+    print(f"🔧 MCP Tool called with handle: {twitterHandle}, maxItems: {maxItems} (using latest tweet only)", flush=True)
 
     if not twitterHandle:
         return json.dumps({"error": "No Twitter handle provided"})
@@ -106,7 +110,7 @@ def get_tweet_for_engagement(twitterHandle: str) -> str:
                 "likes": latest_original_tweet.get('likeCount', 0),
                 "retweets": latest_original_tweet.get('retweetCount', 0)
             },
-            "instruction": "Based on the tweet above, generate a funny, witty, and engaging message to send to this person. The message should cleverly reference specific details from their tweet.",
+            "agent_instruction": "Based on the tweet above, generate a funny, witty, and engaging message to send to this person. The message should cleverly reference specific details from their tweet.",
             "context": "You are helping create a personalized ice-breaker message for professional networking or casual engagement.",
             "requirements": [
                 "Reference specific details from the tweet",
