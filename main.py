@@ -8,6 +8,7 @@ Returns raw JSON output from the API.
 
 import os
 import json
+import sys
 from typing import List, Union
 from dotenv import load_dotenv
 from apify_client import ApifyClient
@@ -26,50 +27,102 @@ client = ApifyClient(APIFY_API_TOKEN)
 # Create FastMCP server
 mcp = FastMCP(name="Simple Twitter Scraper")
 
+print("✅ MCP Server initialized successfully")
+
 @mcp.tool
-def scrape_twitter_handles(twitterHandles: Union[str, List[str]], maxItems: int = 100) -> str:
+def get_tweet_for_engagement(twitterHandle: str) -> str:
     """
-    Scrape tweets from Twitter handles using Apify. Returns raw JSON output.
+    Retrieves the latest tweet from a Twitter handle for generating engagement messages.
+    Returns structured data with tweet content and instructions for message generation.
 
     Args:
-        twitterHandles: Twitter handle(s) to scrape (without @) - can be a single string or list
-        maxItems: Maximum number of tweets to retrieve (default: 100)
+        twitterHandle: Twitter handle to scrape (without @)
 
     Returns:
-        Raw JSON string containing scraped tweets
+        JSON with latest tweet and instructions for generating an engagement message
     """
-    # Convert single string to list
-    if isinstance(twitterHandles, str):
-        twitterHandles = [twitterHandles]
+    print(f"🔧 MCP Tool called with handle: {twitterHandle}", flush=True)
 
-    if not twitterHandles:
-        return "Error: No Twitter handles provided"
+    if not twitterHandle:
+        return json.dumps({"error": "No Twitter handle provided"})
 
     try:
-        # Simple Actor input - just handles and max items
+        print(f"🔄 Starting Apify scraping for @{twitterHandle}", flush=True)
+
+        # Simple Actor input - get latest 3 tweets
         run_input = {
-            "twitterHandles": twitterHandles,
-            "maxItems": maxItems,
+            "twitterHandles": [twitterHandle],
+            "maxItems": 3,
             "sort": "Latest",
             "tweetLanguage": "en"
         }
+        print(f"📝 Apify input: {run_input}", flush=True)
 
         # Run the Actor and wait for it to finish
+        print("🚀 Calling Apify actor...", flush=True)
         run = client.actor("apidojo/tweet-scraper").call(run_input=run_input)
+        print(f"✅ Actor run completed: {run.get('id', 'unknown')}", flush=True)
 
         # Get dataset results
         dataset_id = run["defaultDatasetId"]
+        print(f"📊 Dataset ID: {dataset_id}", flush=True)
 
         # Collect all items
         items = []
         for item in client.dataset(dataset_id).iterate_items():
             items.append(item)
 
-        # Return raw JSON
-        return json.dumps(items, indent=2, ensure_ascii=False)
+        print(f"📦 Collected {len(items)} tweets", flush=True)
+
+        # Find the first non-retweet
+        latest_original_tweet = None
+        for tweet in items:
+            if not tweet.get('isRetweet', False):
+                latest_original_tweet = tweet
+                break
+
+        if not latest_original_tweet:
+            # If all are retweets, just use the first one
+            latest_original_tweet = items[0] if items else None
+
+        if not latest_original_tweet:
+            return json.dumps({
+                "error": "No tweets found for this handle"
+            })
+
+        # Extract key information
+        tweet_text = latest_original_tweet.get('text', '')
+        tweet_url = latest_original_tweet.get('url', '')
+        created_at = latest_original_tweet.get('createdAt', '')
+
+        print(f"📝 Latest tweet: {tweet_text[:100]}...", flush=True)
+
+        # Return structured response with instructions
+        response = {
+            "latest_tweet": {
+                "text": tweet_text,
+                "url": tweet_url,
+                "created_at": created_at,
+                "likes": latest_original_tweet.get('likeCount', 0),
+                "retweets": latest_original_tweet.get('retweetCount', 0)
+            },
+            "instruction": "Based on the tweet above, generate a funny, witty, and engaging message to send to this person. The message should cleverly reference specific details from their tweet.",
+            "context": "You are helping create a personalized ice-breaker message for professional networking or casual engagement.",
+            "requirements": [
+                "Reference specific details from the tweet",
+                "Be witty and attention-grabbing",
+                "Keep it under 280 characters",
+                "Use a professional but personable tone",
+                "Make it genuinely funny or clever"
+            ]
+        }
+
+        return json.dumps(response, indent=2, ensure_ascii=False)
 
     except Exception as e:
-        return f"Error: {str(e)}"
+        error_msg = f"Error: {str(e)}"
+        print(f"❌ {error_msg}", flush=True)
+        return json.dumps({"error": error_msg})
 
 if __name__ == "__main__":
     # Run HTTP server for ngrok deployment
@@ -77,5 +130,10 @@ if __name__ == "__main__":
     print("📡 Server will be available at: http://localhost:8000/mcp")
     print("🔗 Use ngrok to expose: ngrok http 8000")
     print("🌐 Then give Le Chat: https://your-ngrok-url.ngrok.io/mcp")
+    print("🔍 Debug mode enabled - will show all requests")
 
-    mcp.run(transport="http", host="0.0.0.0", port=8000, path="/mcp")
+    try:
+        mcp.run(transport="http", host="0.0.0.0", port=8000, path="/mcp")
+    except Exception as e:
+        print(f"❌ Server error: {e}")
+        raise
