@@ -8,7 +8,7 @@ Returns raw JSON output from the API.
 
 import os
 import json
-from typing import List
+from typing import List, Union
 from dotenv import load_dotenv
 from apify_client import ApifyClient
 from fastmcp import FastMCP
@@ -27,17 +27,21 @@ client = ApifyClient(APIFY_API_TOKEN)
 mcp = FastMCP(name="Simple Twitter Scraper")
 
 @mcp.tool
-def scrape_twitter_handles(twitterHandles: List[str], maxItems: int = 100) -> str:
+def scrape_twitter_handles(twitterHandles: Union[str, List[str]], maxItems: int = 100) -> str:
     """
     Scrape tweets from Twitter handles using Apify. Returns raw JSON output.
 
     Args:
-        twitterHandles: List of Twitter handles to scrape (without @)
+        twitterHandles: Twitter handle(s) to scrape (without @) - can be a single string or list
         maxItems: Maximum number of tweets to retrieve (default: 100)
 
     Returns:
         Raw JSON string containing scraped tweets
     """
+    # Convert single string to list
+    if isinstance(twitterHandles, str):
+        twitterHandles = [twitterHandles]
+
     if not twitterHandles:
         return "Error: No Twitter handles provided"
 
@@ -68,4 +72,10 @@ def scrape_twitter_handles(twitterHandles: List[str], maxItems: int = 100) -> st
         return f"Error: {str(e)}"
 
 if __name__ == "__main__":
-    mcp.run()
+    # Run HTTP server for ngrok deployment
+    print("🚀 Starting Twitter MCP Server on HTTP...")
+    print("📡 Server will be available at: http://localhost:8000/mcp")
+    print("🔗 Use ngrok to expose: ngrok http 8000")
+    print("🌐 Then give Le Chat: https://your-ngrok-url.ngrok.io/mcp")
+
+    mcp.run(transport="http", host="0.0.0.0", port=8000, path="/mcp")
