@@ -128,16 +128,16 @@ def scrape_twitter_handles(twitterHandle: str, maxItems: int = 3) -> str:
                 "retweets": latest_original_tweet.get('retweetCount', 0),
                 "platform": "twitter"
             },
-            "agent_instruction": "Based on the tweet above, generate a HILARIOUS, playful, and attention-grabbing message that will make this person stop scrolling and laugh out loud. Be bold, creative, and memorable!",
-            "context": "You are creating an ice-breaker that breaks through the noise of boring DMs. This person gets hundreds of messages - yours needs to STAND OUT and be genuinely entertaining.",
+            "agent_instruction": "Based on the tweet above, generate a witty, clever conversation starter with playful observations. Be cool and fun with smart wordplay or unexpected angles on their story.",
+            "context": "You're at the same event as this person and want to approach them naturally. Create an opening line that references their work without being awkward or overly flattering. Make it conversational and genuine.",
             "requirements": [
-                "Be genuinely funny and playful (not corporate funny)",
-                "Reference specific details from their tweet in a clever/unexpected way",
-                "Use humor, wordplay, memes, or surprising angles",
-                "Be bold and attention-grabbing (but not offensive)",
-                "Keep it under 280 characters",
-                "Make them want to respond because it's actually entertaining",
-                "Think 'would I screenshot this and send it to friends?' level of wit"
+                "Be witty and playful with clever observations or wordplay",
+                "Use unexpected angles or fun metaphors (like the breakfast/eggs example)",
+                "Be casual and cool - show intelligence through humor",
+                "Keep it short and punchy (1-2 sentences max)",
+                "Make playful observations about their situation or story",
+                "NEVER use 'I saw', 'I heard', 'I read', 'I know' - just make observations",
+                "Think 'witty friend making clever comments at a party'"
             ]
         }
 
@@ -256,16 +256,16 @@ def scrape_linkedin_profile(username: str, limit: int = 5, total_posts: Optional
                 },
                 "platform": "linkedin"
             },
-            "agent_instruction": "Based on the LinkedIn post above, generate a playful, witty, and memorable message that stands out from boring LinkedIn spam. Be professional enough for LinkedIn but fun enough to get their attention and make them smile!",
-            "context": "You are creating a LinkedIn message that breaks through the sea of generic connection requests. This person gets tons of boring 'I'd like to add you to my network' messages - yours should make them chuckle and actually want to connect.",
+            "agent_instruction": "Based on the LinkedIn post above, generate a witty, playful conversation starter with clever observations about their achievement. Be fun and cool with smart wordplay.",
+            "context": "You're at the same event as this person and want to start a conversation referencing their recent achievement. Make it sound natural and conversational, like you just recognized them.",
             "requirements": [
-                "Be genuinely witty and playful (not stiff corporate speak)",
-                "Reference specific details from their post with humor or clever insights",
-                "Use light humor, wordplay, or unexpected perspectives",
-                "Professional enough for LinkedIn, fun enough to be memorable",
-                "Keep it concise (under 300 characters for connection request)",
-                "Make them curious about who you are and want to respond",
-                "Think 'finally, someone who actually read my post and has personality' vibe"
+                "Be witty and playful with clever observations or wordplay",
+                "Use unexpected angles or fun metaphors about their achievement",
+                "Be casual and cool - show intelligence through humor",
+                "Keep it short and punchy (1-2 sentences max)",
+                "Make playful observations about their situation or work",
+                "NEVER use 'I' followed by any verb - just make witty observations",
+                "Think 'witty friend making clever comments about their success'"
             ]
         }
 
