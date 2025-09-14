@@ -42,49 +42,6 @@ mcp = FastMCP(name="Social Media Cold Outreach Assistant")
 print("✅ MCP Server initialized successfully")
 
 @weave.op()
-def call_apify_actor(actor_id: str, run_input: dict, platform: str) -> dict:
-    """
-    Wrapper function to track Apify API calls with timing and metrics.
-
-    Args:
-        actor_id: The Apify actor ID to call
-        run_input: Input parameters for the actor
-        platform: Platform being scraped (twitter/linkedin)
-
-    Returns:
-        Dict with run results and metadata
-    """
-    start_time = time.time()
-
-    try:
-        print(f"🚀 Calling Apify actor {actor_id} for {platform}...", flush=True)
-        run = client.actor(actor_id).call(run_input=run_input)
-        duration = time.time() - start_time
-
-        print(f"✅ Actor run completed in {duration:.2f}s: {run.get('id', 'unknown')}", flush=True)
-
-        return {
-            "run": run,
-            "success": True,
-            "duration": duration,
-            "platform": platform,
-            "actor_id": actor_id,
-            "input_size": len(str(run_input))
-        }
-    except Exception as e:
-        duration = time.time() - start_time
-        print(f"❌ Actor call failed after {duration:.2f}s: {str(e)}", flush=True)
-        return {
-            "run": None,
-            "success": False,
-            "duration": duration,
-            "platform": platform,
-            "actor_id": actor_id,
-            "error": str(e),
-            "input_size": len(str(run_input))
-        }
-
-@weave.op()
 @mcp.tool
 def scrape_twitter_handles(twitterHandle: str, maxItems: int = 3) -> str:
     """
@@ -119,12 +76,9 @@ def scrape_twitter_handles(twitterHandle: str, maxItems: int = 3) -> str:
         print(f"📝 Apify input: {run_input}", flush=True)
 
         # Run the Actor and wait for it to finish
-        actor_result = call_apify_actor("apidojo/tweet-scraper", run_input, "twitter")
-
-        if not actor_result["success"]:
-            return json.dumps({"error": f"Apify actor failed: {actor_result.get('error', 'Unknown error')}"})
-
-        run = actor_result["run"]
+        print("🚀 Calling Apify actor...", flush=True)
+        run = client.actor("apidojo/tweet-scraper").call(run_input=run_input)
+        print(f"✅ Actor run completed: {run.get('id', 'unknown')}", flush=True)
 
         # Get dataset results
         dataset_id = run["defaultDatasetId"]
@@ -238,12 +192,9 @@ def scrape_linkedin_profile(username: str, limit: int = 5, total_posts: Optional
         print(f"📝 Apify input: {run_input}", flush=True)
 
         # Run the Actor and wait for it to finish
-        actor_result = call_apify_actor("apimaestro/linkedin-profile-posts", run_input, "linkedin")
-
-        if not actor_result["success"]:
-            return json.dumps({"error": f"Apify actor failed: {actor_result.get('error', 'Unknown error')}"})
-
-        run = actor_result["run"]
+        print("🚀 Calling Apify LinkedIn actor...", flush=True)
+        run = client.actor("apimaestro/linkedin-profile-posts").call(run_input=run_input)
+        print(f"✅ Actor run completed: {run.get('id', 'unknown')}", flush=True)
 
         # Get dataset results
         dataset_id = run["defaultDatasetId"]
