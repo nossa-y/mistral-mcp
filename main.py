@@ -63,6 +63,10 @@ def scrape_twitter_handles(twitterHandle: str, maxItems: int = 3) -> str:
     if not twitterHandle:
         return json.dumps({"error": "No Twitter handle provided"})
 
+    # If the handle looks like a full name (e.g., "First Last"), convert to joined format "firstlast"
+    if " " in twitterHandle and not twitterHandle.startswith("http"):
+        twitterHandle = twitterHandle.strip().replace(" ", "").lower()
+
     try:
         print(f"🔄 Starting Apify scraping for @{twitterHandle}", flush=True)
 
