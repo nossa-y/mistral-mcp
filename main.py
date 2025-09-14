@@ -41,8 +41,8 @@ mcp = FastMCP(name="Social Media Cold Outreach Assistant")
 
 print("✅ MCP Server initialized successfully")
 
-@weave.op()
 @mcp.tool
+@weave.op()
 def scrape_twitter_handles(twitterHandle: str, maxItems: int = 3) -> str:
     """
     Helps cold approach, reach out to, or engage with someone on Twitter/X by analyzing their latest tweet.
@@ -144,8 +144,8 @@ def scrape_twitter_handles(twitterHandle: str, maxItems: int = 3) -> str:
         print(f"❌ {error_msg}", flush=True)
         return json.dumps({"error": error_msg})
 
-@weave.op()
 @mcp.tool
+@weave.op()
 def scrape_linkedin_profile(username: str, limit: int = 5, total_posts: Optional[int] = None) -> str:
     """
     Helps cold approach, reach out to, or engage with someone on LinkedIn by analyzing their recent posts.
