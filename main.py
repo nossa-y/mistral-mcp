@@ -277,9 +277,14 @@ def scrape_linkedin_profile(username: str, limit: int = 5, total_posts: Optional
         return json.dumps({"error": error_msg})
 
 if __name__ == "__main__":
-    # Run HTTP server for ngrok deployment
+    import os
+
+    # Get port from environment (Alpic sets this) or default to 8000
+    port = int(os.environ.get("PORT", 8000))
+
+    # Run HTTP server for deployment
     print("🚀 Starting Social Media Cold Outreach MCP Server on HTTP...")
-    print("📡 Server will be available at: http://localhost:8000/mcp")
+    print(f"📡 Server will be available at: http://localhost:{port}/mcp")
     print("🔗 Use ngrok to expose: ngrok http 8000")
     print("🌐 Then give Le Chat: https://your-ngrok-url.ngrok.io/mcp")
     print("🔍 Debug mode enabled - will show all requests")
@@ -288,7 +293,7 @@ if __name__ == "__main__":
     print("  - scrape_linkedin_profile: Analyze LinkedIn profiles")
 
     try:
-        mcp.run(transport="http", host="0.0.0.0", port=8000, path="/mcp")
+        mcp.run(transport="http", host="0.0.0.0", port=port, path="/mcp")
     except Exception as e:
         print(f"❌ Server error: {e}")
         raise
