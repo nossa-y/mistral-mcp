@@ -8,6 +8,7 @@ dependencies = [
     "fastmcp>=2.0.0",
     "apify-client>=1.7.0",
     "python-dotenv>=1.0.0",
+    "weave>=0.52.7",
 ]
 
 [tool.hatch.build.targets.wheel]

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Test the simplified MCP server
+Test the Social Media Cold Outreach MCP Server
 """
 
 import asyncio
@@ -8,8 +8,8 @@ from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
 async def test_simple_mcp_server():
-    """Test the simplified MCP server"""
-    print("🧪 Testing Simple Twitter MCP Server...")
+    """Test the Social Media Cold Outreach MCP Server"""
+    print("🧪 Testing Social Media Cold Outreach MCP Server...")
 
     server_params = StdioServerParameters(
         command="uv",
@@ -29,26 +29,47 @@ async def test_simple_mcp_server():
                 for tool in tools.tools:
                     print(f"  - {tool.name}")
 
-                # Test with nossa_ym handle
-                print(f"\n🐦 Testing with @nossa_ym (2 tweets)...")
-                result = await session.call_tool(
+                # Test Twitter handle
+                print(f"\n🐦 Testing Twitter with @elonmusk...")
+                twitter_result = await session.call_tool(
                     "scrape_twitter_handles",
                     arguments={
-                        "twitterHandles": ["nossa_ym"],
-                        "maxItems": 2
+                        "twitterHandle": "elonmusk",
+                        "maxItems": 3
                     }
                 )
 
-                print("✅ Raw JSON Response:")
-                if result.content:
-                    text = result.content[0].text
+                print("✅ Twitter Response:")
+                if twitter_result.content:
+                    text = twitter_result.content[0].text
                     # Show first 500 chars for brevity
                     if len(text) > 500:
                         print(text[:500] + "\n... [truncated] ...")
                     else:
                         print(text)
                 else:
-                    print("No content returned")
+                    print("No Twitter content returned")
+
+                # Test LinkedIn profile
+                print(f"\n💼 Testing LinkedIn with satyanadella...")
+                linkedin_result = await session.call_tool(
+                    "scrape_linkedin_profile",
+                    arguments={
+                        "username": "satyanadella",
+                        "limit": 5
+                    }
+                )
+
+                print("✅ LinkedIn Response:")
+                if linkedin_result.content:
+                    text = linkedin_result.content[0].text
+                    # Show first 500 chars for brevity
+                    if len(text) > 500:
+                        print(text[:500] + "\n... [truncated] ...")
+                    else:
+                        print(text)
+                else:
+                    print("No LinkedIn content returned")
 
             except Exception as e:
                 print(f"❌ Error: {e}")
