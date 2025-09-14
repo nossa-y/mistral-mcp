@@ -227,6 +227,7 @@ def scrape_linkedin_profile(username: str, limit: int = 5, total_posts: Optional
         relative_time = posted_at.get('relative', '')
         author_info = latest_post.get('author', {})
         stats = latest_post.get('stats', {})
+        post_type = latest_post.get('post_type', '')
 
         print(f"📝 Latest LinkedIn post: {post_text[:100]}...", flush=True)
         print(f"📅 Posted: {post_date} ({relative_time})", flush=True)
@@ -236,6 +237,7 @@ def scrape_linkedin_profile(username: str, limit: int = 5, total_posts: Optional
             "latest_post": {
                 "text": post_text,
                 "url": post_url,
+                "post_type": post_type,
                 "posted_date": post_date,
                 "relative_time": relative_time,
                 "author": {
