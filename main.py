@@ -277,15 +277,21 @@ def scrape_linkedin_profile(username: str, limit: int = 5, total_posts: Optional
         return json.dumps({"error": error_msg})
 
 if __name__ == "__main__":
-    # For serverless deployment (like Alpic), let the platform handle HTTP transport
+    import os
+
+    # Get port from environment (Render sets this) or default to 8000
+    port = int(os.environ.get("PORT", 8000))
+
     print("🚀 Starting Social Media Cold Outreach MCP Server...")
+    print(f"📡 Server will be available at: http://0.0.0.0:{port}/mcp")
     print("📱 Available tools:")
     print("  - scrape_twitter_handles: Analyze Twitter/X profiles")
     print("  - scrape_linkedin_profile: Analyze LinkedIn profiles")
 
     try:
-        # Use streamable HTTP for cloud deployment - let platform handle port/host
-        mcp.run(transport="streamable-http")
+        # Use HTTP transport for Render deployment
+        mcp.run(transport="http", host="0.0.0.0", port=port, path="/mcp")
     except Exception as e:
         print(f"❌ Server error: {e}")
         raise
+    

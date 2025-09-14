@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: mcp-social-outreach
+    runtime: python3
+    buildCommand: pip install -r requirements.txt
+    startCommand: python main.py
+    plan: free
+    env:
+      - key: APIFY_API_TOKEN
+        sync: false
+      - key: WANDB_API_KEY
+        sync: false
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
